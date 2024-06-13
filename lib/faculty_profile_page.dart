@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testrru1/auth.dart';
 import 'package:testrru1/exp_facultydata.dart';
-import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class FacultyRegistration extends StatefulWidget {
   @override
@@ -20,12 +20,9 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _positionController = TextEditingController();
-  final TextEditingController _officeController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _husbandFatherController =
-      TextEditingController();
+  final TextEditingController _husbandFatherController = TextEditingController();
 
   // Radio button values
   String? _gender;
@@ -58,7 +55,6 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
         'name': _nameController.text,
         'email': _emailController.text,
         'phone': _phoneController.text,
-        'position': _positionController.text,
         'dob': _dobController.text,
         'address': _addressController.text,
         'gender': _gender,
@@ -82,7 +78,6 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
-        _positionController.clear();
         _dobController.clear();
         _addressController.clear();
         _husbandFatherController.clear();
@@ -120,20 +115,27 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
   }
 
   Future<void> _selectDate(int index, bool isStartDate) async {
+    DateTime now = DateTime.now();
+    DateTime initialDate = DateTime(now.year, now.month - 1);
+
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(1900),
-      lastDate: DateTime(2101),
+      lastDate: initialDate,
     );
-    if (picked != null) {
+    if (picked != null && picked.isBefore(DateTime(now.year, now.month))) {
       setState(() {
         if (isStartDate) {
-          _employmentList[index].startMonthYear =
-              '${picked.month}-${picked.year}';
+          _employmentList[index].startMonthYear = DateFormat('MM/yyyy').format(picked);
+          _employmentList[index].endMonthYear = '';
         } else {
-          _employmentList[index].endMonthYear =
-              '${picked.month}-${picked.year}';
+          DateTime startDate = DateFormat('MM/yyyy').parse(_employmentList[index].startMonthYear);
+          if (picked.isAfter(startDate)) {
+            _employmentList[index].endMonthYear = DateFormat('MM/yyyy').format(picked);
+          } else {
+            _showMessage('End month must be after start month');
+          }
         }
       });
     }
@@ -190,22 +192,28 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                 },
               ),
               SizedBox(height: 16.0),
-              // Position
-              TextFormField(
-                controller: _positionController,
-                decoration: InputDecoration(labelText: 'Position'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your position';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16.0),
               // Date of Birth
               TextFormField(
                 controller: _dobController,
-                decoration: InputDecoration(labelText: 'Date of Birth'),
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Date of Birth',
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null) {
+                    setState(() {
+                      _dobController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                    });
+                  }
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your date of birth';
@@ -213,6 +221,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                   return null;
                 },
               ),
+
               SizedBox(height: 16.0),
               // Address
               TextFormField(
@@ -262,7 +271,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                   Text('Other'),
                 ],
               ),
-              SizedBox(height: 16.0),
+              // SizedBox(height: 2.0),
               // Marital Status
               Row(
                 children: <Widget>[
@@ -289,7 +298,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                   Text('Unmarried'),
                 ],
               ),
-              SizedBox(height: 16.0),
+              // SizedBox(height: 16.0),
               // Husband/Father Name (Conditional)
               if (_gender == 'Female')
                 TextFormField(
@@ -302,18 +311,6 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                     return null;
                   },
                 ),
-              SizedBox(height: 16.0),
-              // Office
-              TextFormField(
-                controller: _officeController,
-                decoration: InputDecoration(labelText: 'Office'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your office';
-                  }
-                  return null;
-                },
-              ),
               SizedBox(height: 16.0),
               // Table for Experience/Previous Employment Info
               // Table Header
@@ -330,7 +327,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black,
-                    width: 1.0,
+                    width: 2.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -347,72 +344,105 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                     for (int i = 0; i < _employmentList.length; i++)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue: _employmentList[i].company,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _employmentList[i].company = value;
-                                      });
-                                    },
-                                    decoration: InputDecoration(labelText: 'Company'),
-                                  ),
-                                ),
-                                SizedBox(width: 8.0),
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue: _employmentList[i].position,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _employmentList[i].position = value;
-                                      });
-                                    },
-                                    decoration:
-                                    InputDecoration(labelText: 'Position'),
-                                  ),
-                                ),
-                              ],
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1.0,
                             ),
-                            SizedBox(height: 8.0),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: TextEditingController(
-                                        text: _employmentList[i].startMonthYear),
-                                    readOnly: true,
-                                    onTap: () => _selectDate(i, true),
-                                    decoration: InputDecoration(
-                                      labelText: 'Start Month-Year',
-                                      suffixIcon: Icon(Icons.calendar_today),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: _employmentList[i].company,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _employmentList[i].company = value;
+                                        });
+                                      },
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter Company Name';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(labelText: 'Company'),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 16.0),
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: TextEditingController(
-                                        text: _employmentList[i].endMonthYear),
-                                    readOnly: true,
-                                    onTap: () => _selectDate(i, false),
-                                    decoration: InputDecoration(
-                                      labelText: 'End Month-Year',
-                                      suffixIcon: Icon(Icons.calendar_today),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: _employmentList[i].position,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _employmentList[i].position = value;
+                                        });
+                                      },
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter position';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(labelText: 'Position'),
                                     ),
                                   ),
-                                ),
-                                if (i > 0)
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => removeRow(i),
+                                ],
+                              ),
+                              SizedBox(height: 8.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: TextEditingController(
+                                          text: _employmentList[i].startMonthYear),
+                                      readOnly: true,
+                                      onTap: () => _selectDate(i, true),
+                                      decoration: InputDecoration(
+                                        labelText: 'Start Month-Year',
+                                        suffixIcon: Icon(Icons.calendar_today),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Select Satart Month-Year';
+                                        }
+                                        return null;
+                                      },
+                                    ),
                                   ),
-                              ],
-                            ),
-                          ],
+                                  SizedBox(width: 16.0),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: TextEditingController(
+                                          text: _employmentList[i].endMonthYear),
+                                      readOnly: true,
+                                      onTap: () => _selectDate(i, false),
+                                      decoration: InputDecoration(
+                                        labelText: 'End Month-Year',
+                                        suffixIcon: Icon(Icons.calendar_today),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Select End Month-Year';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  if (i > 0)
+                                    IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => removeRow(i),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                   ],
