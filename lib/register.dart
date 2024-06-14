@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:testrru1/auth.dart';
 import 'package:intl/intl.dart';
 
-class AdminRegistrationPage extends StatefulWidget {
+class StudentRegistrationPage extends StatefulWidget {
   @override
-  _AdminRegistrationPageState createState() => _AdminRegistrationPageState();
+  _StudentRegistrationPageState createState() => _StudentRegistrationPageState();
 }
 
-class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
+class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
   final _formKey = GlobalKey<FormState>();
   final Authservice _auth = Authservice();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -30,6 +30,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
 
       // Creates a map with user data
       Map<String, dynamic> userData = {
+        'role': _role,
         'name': _nameController.text,
         'email': _emailController.text,
         'phone': _phoneController.text,
@@ -39,6 +40,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
         'degree': _degreeController.text,
         'fieldOfStudy': _fieldOfStudyController.text,
         'graduationYear': _graduationYearController.text,
+        'birthdate': _birthdateController.text,
 
       };
       print("User Data: $userData");
@@ -52,7 +54,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
 
 
       // Generate password from birthdate
-      DateTime birthdate = DateFormat('yyyy-MM-dd').parse(_birthdateController.text);
+      DateTime birthdate = DateFormat('dd/MM/yyyy').parse(_birthdateController.text);
       String generatedPassword = DateFormat('ddMMyy').format(birthdate);
 
 
@@ -114,37 +116,16 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Student Registration'),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
-              SafeArea(
-                child: Center(
-                  child: Image.asset('assets/Logo copy.png',
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-              ),
-
-              DropdownButtonFormField(
-                value: _role,
-                decoration: InputDecoration(labelText: 'Role'),
-                items: ['student', 'faculty'].map((role) {
-                  return DropdownMenuItem(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _role = newValue!;
-                  });
-                },
-              ),
-              SizedBox(height: 16,),
               Text(
                 'Personal Information',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -210,7 +191,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
 
                       if (pickedDate != null) {
                         setState(() {
-                          _birthdateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                          _birthdateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
                         });
                       }
                     },

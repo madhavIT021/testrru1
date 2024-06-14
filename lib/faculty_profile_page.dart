@@ -20,9 +20,9 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _husbandFatherController = TextEditingController();
+  final TextEditingController _departmentController = TextEditingController();
 
   // Radio button values
   String? _gender;
@@ -52,23 +52,36 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
     if (_formKey.currentState!.validate()) {
       // Get form values
       Map<String, dynamic> userData = {
+        'role' : _role,
         'name': _nameController.text,
         'email': _emailController.text,
         'phone': _phoneController.text,
-        'dob': _dobController.text,
+        'birthdate': _birthdateController.text,
         'address': _addressController.text,
         'gender': _gender,
         'maritalStatus': _maritalStatus,
-        'husbandFatherName': _husbandFatherController.text,
+        'department': _departmentController.text,
         'employmentInfo': _employmentList.map((info) => info.toJson()).toList(),
       };
 
       print("User Data: $userData");
+
+      // Generate email
+      String name = _nameController.toString().toLowerCase();
+      String department = _departmentController.toString().toLowerCase();
+      String generatedEmail = '${name}.${department}@rru.ac.in';
+
+
+      // Generate password from birthdate
+      DateTime birthdate = DateFormat('dd/MM/yyyy').parse(_birthdateController.text);
+      String generatedPassword = DateFormat('ddMMyy').format(birthdate);
+
+
       // Register faculty member
       dynamic result = await _auth.registerWithEmailandPassword(
         _role,
-        _emailController.text,
-        _phoneController.text,
+        generatedEmail,
+        generatedPassword,
         userData,
       );
 
@@ -78,9 +91,9 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
-        _dobController.clear();
+        _birthdateController.clear();
         _addressController.clear();
-        _husbandFatherController.clear();
+        _departmentController.clear();
         setState(() {
           _gender = null;
           _maritalStatus = null;
@@ -146,6 +159,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Faculty Registration'),
+        centerTitle:true,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -154,6 +168,12 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              Text(
+                'Personal Information',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+
               // Name
               TextFormField(
                 controller: _nameController,
@@ -194,7 +214,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
               SizedBox(height: 16.0),
               // Date of Birth
               TextFormField(
-                controller: _dobController,
+                controller: _birthdateController,
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Date of Birth',
@@ -210,7 +230,7 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
 
                   if (pickedDate != null) {
                     setState(() {
-                      _dobController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                      _birthdateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
                     });
                   }
                 },
@@ -235,6 +255,20 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
                 },
               ),
               SizedBox(height: 16.0),
+
+              //department
+              TextFormField(
+                controller: _departmentController,
+                decoration: InputDecoration(labelText: 'Department'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.0),
+
               // Gender
               Row(
                 children: <Widget>[
@@ -300,17 +334,17 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
               ),
               // SizedBox(height: 16.0),
               // Husband/Father Name (Conditional)
-              if (_gender == 'Female')
-                TextFormField(
-                  controller: _husbandFatherController,
-                  decoration: InputDecoration(labelText: 'Husband/Father Name'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Husband/Father Name';
-                    }
-                    return null;
-                  },
-                ),
+              // if (_gender == 'Female')
+              //   TextFormField(
+              //     controller: _husbandFatherController,
+              //     decoration: InputDecoration(labelText: 'Husband/Father Name'),
+              //     validator: (value) {
+              //       if (value == null || value.isEmpty) {
+              //         return 'Please enter Husband/Father Name';
+              //       }
+              //       return null;
+              //     },
+              //   ),
               SizedBox(height: 16.0),
               // Table for Experience/Previous Employment Info
               // Table Header

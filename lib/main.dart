@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:testrru1/faculty_profile_page.dart';
 import 'package:testrru1/register.dart';
+import 'package:flutter_svg/svg.dart';
 
 void main() async{
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -34,11 +35,112 @@ class _MyAppState extends State<MyApp> {
 
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: FacultyRegistration(),
+      home: AdminDashboard(),
       debugShowCheckedModeBanner: false,
     );
 
 
   }
 }
+class AdminDashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Admin Dashboard',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                'assets/Logo copy.png',
+                width: 200,  // Adjust the width as needed
+                height: 200, // Adjust the height as needed
+              ),
+            ),
+          ),
+          ListView(
+          children: [
+            ListTile(
+              leading: SvgPicture.asset(
+                'assets/add-profile.svg',
+                semanticsLabel: 'My SVG Image',
+                width: 24,
+              ),
+              title: Text('Faculty Registration', style: TextStyle(fontSize: 20),),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FacultyRegistration()),
+                );
+              },
+            ),
+            ListTile(
+              leading: SvgPicture.asset(
+                'assets/add-profile.svg',
+                semanticsLabel: 'My SVG Image',
+                width: 24,
+              ),
+              title: Text('Student Registration', style: TextStyle(fontSize: 20),),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentRegistrationPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: SvgPicture.asset(
+                'assets/edit-profile.svg',
+                semanticsLabel: 'My SVG Image',
+                width: 24,
+              ),
+              title: Text('Edit Faculty Profile', style: TextStyle(fontSize: 20)),
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => RegisterPage()),
+                // );
+              },
+            ),
+            ListTile(
+              leading: SvgPicture.asset(
+                'assets/edit-profile.svg',
+                semanticsLabel: 'My SVG Image',
+                width: 24,
+              ),
+              title: Text('Edit Student Profile', style: TextStyle(fontSize: 20)),
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => SettingsPage()),
+                // );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings', style: TextStyle(fontSize: 20)),
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => RegisterPage()),
+                // );
+              },
+            ),
+          ],
+        ),
+    ],
+      ),
+    );
+  }
+}
+
 
