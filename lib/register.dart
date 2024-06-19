@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testrru1/auth.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentRegistrationPage extends StatefulWidget {
   @override
@@ -67,6 +68,11 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
       );
 
       if (result != null) {
+       await  FirebaseFirestore.instance.collection('studentCredentials').doc(result.uid).set({
+          'user-email': generatedEmail,
+          'user-password': generatedPassword,
+        });
+
         _showMessage('User registered successfully!');
         // Clear text field controllers after successful registration
         _nameController.clear();

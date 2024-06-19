@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:testrru1/database.dart';
 import 'dart:io';
 
@@ -20,10 +19,21 @@ class Authservice {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
-      print("HIiiiiiiiiiiiiiiiiiiiiiii");
+
+      print("Hiiiiiiiiiiiiiiiiiiiiiiii"); // log for initiation
+
+      // //update the sequence number
+      // final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getNextSequenceNumber');
+      // final response = await callable();
+      // final int sequenceNumber = response.data;
+
+      // userData['sequenceNumber'] = sequenceNumber;
+
       // Create a new document for the user with uid
       await DatabaseServices(uid : user!.uid).updateUserData(role,userData);
-      print("Byeeeeeeeeeeeeeeeeeeeeeee");
+
+      print("Byeeeeeeeeeeeeeeeeeeeeeee"); // log for confirmation
+
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());

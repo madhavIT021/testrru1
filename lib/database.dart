@@ -11,6 +11,7 @@ class DatabaseServices {
   // Collections for students and faculty
   final CollectionReference studentCollection = FirebaseFirestore.instance.collection("students");
   final CollectionReference facultyCollection = FirebaseFirestore.instance.collection("faculty");
+  final CollectionReference userDataCollection = FirebaseFirestore.instance.collection("credentials");
 
   Future<void> updateUserData(String role, Map<String, dynamic> userData) async {
     try {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:testrru1/auth.dart';
 import 'package:testrru1/exp_facultydata.dart';
@@ -67,8 +68,11 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
       print("User Data: $userData");
 
       // Generate email
-      String name = _nameController.toString().toLowerCase();
-      String department = _departmentController.toString().toLowerCase();
+      String name = _nameController.text.trim().toLowerCase();
+      String department = _departmentController.text.trim().toLowerCase();
+      name = name.replaceAll(' ', '');
+      department = department.replaceAll(' ', '');
+      print(name);
       String generatedEmail = '${name}.${department}@rru.ac.in';
 
 
@@ -80,12 +84,19 @@ class _FacultyRegistrationState extends State<FacultyRegistration> {
       // Register faculty member
       dynamic result = await _auth.registerWithEmailandPassword(
         _role,
+        // _emailController.text,
         generatedEmail,
         generatedPassword,
         userData,
       );
 
+
+
       if (result != null) {
+        await  FirebaseFirestore.instance.collection('facultyCredentials').doc(result.uid).set({
+          'user-email': generatedEmail,
+          'user-password': generatedPassword,
+        });
         _showMessage('User registered successfully!');
         // Clear text field controllers after successful registration
         _nameController.clear();
