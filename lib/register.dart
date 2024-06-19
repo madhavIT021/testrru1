@@ -47,11 +47,11 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
       print("User Data: $userData");
 
       // Generate email
-      int sequenceNumber = await _getNextSequenceNumber(_fieldOfStudyController.text);
+      int sequenceNumber = userData['sequenceNumber'];
       String year = _yearController.text.substring(2); // Get last two digits of the year
       String fieldOfStudy = _fieldOfStudyController.text;
-      String formattedSequence = sequenceNumber.toString().padLeft(3, '0');
-      String generatedEmail = '$year$fieldOfStudy$formattedSequence@rru.ac.in';
+      // String formattedSequence = sequenceNumber.toString().padLeft(3, '0');
+      String generatedEmail = '$year$fieldOfStudy$sequenceNumber@rru.ac.in';
 
 
       // Generate password from birthdate
@@ -92,11 +92,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
   }
 
 
-  Future<int> _getNextSequenceNumber(String fieldOfStudy) async {
-    // Replace this with your logic to get the next sequence number from your database
-    // For now, we'll just return a dummy value for demonstration
-    return 2; // This should be replaced with actual logic
-  }
+  // Future<int> _getNextSequenceNumber(String fieldOfStudy) async {
+  //
+  //   return 2; // This should be replaced with actual logic
+  // }
 
   ///show message when user try to register
   void _showMessage(String message) {
