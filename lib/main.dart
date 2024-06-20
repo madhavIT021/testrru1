@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:testrru1/eventPage.dart';
 import 'package:testrru1/faculty_profile_page.dart';
 import 'package:testrru1/register.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
 
 void main() async{
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +45,40 @@ class _MyAppState extends State<MyApp> {
 
   }
 }
-class AdminDashboard extends StatelessWidget {
+
+
+class AdminDashboard extends StatefulWidget {
+
+  @override
+  State<AdminDashboard> createState() => _AdminDashboardState();
+}
+
+class _AdminDashboardState extends State<AdminDashboard> {
+  late VideoPlayerController _videoPlayerController;
+
+  late ChewieController _chewieController;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoPlayerController = VideoPlayerController.asset('assets/appointment.mp4');
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoInitialize: true,
+      looping: true,  // Set looping to true if you want the video to loop
+      allowPlaybackSpeedChanging: false,  // Optional: Customize playback controls
+      allowFullScreen: false,
+      // Other customization options can be set here as per your requirement
+    );
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +95,7 @@ class AdminDashboard extends StatelessWidget {
         children: [
           Center(
             child: Opacity(
-              opacity: 0.7,
+              opacity: 0.3,
               child: Image.asset(
                 'assets/Logo copy.png',
                 width: 200,  // Adjust the width as needed
@@ -133,6 +169,19 @@ class AdminDashboard extends StatelessWidget {
                 //   context,
                 //   MaterialPageRoute(builder: (context) => RegisterPage()),
                 // );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.event),
+              title: Text(
+                'Add events',
+                style: TextStyle(fontSize: 20),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddEvent()),
+                );
               },
             ),
           ],
