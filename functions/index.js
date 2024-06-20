@@ -1,60 +1,19 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const nodemailer = require('nodemailer');
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
 
-admin.initializeApp();
+const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
 
-const db = admin.firestore();
+// Create and deploy your first functions
+// https://firebase.google.com/docs/functions/get-started
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'mddesai207@gmail.com',
-    pass: 'madhav207'
-  },
-});
-
-exports.sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
-  const userUid = user.uid;
-
-  try {
-    const doc = await db.collection('userCredentials').doc(userUid).get();
-    if (!doc.exists) {
-      console.log('No user credentials found!');
-      return;
-    }
-
-    const userData = doc.data();
-    const userEmail = userData['user-email'];
-    const userPassword = userData['user-password'];
-
-    const mailOptions = {
-      from: 'mddesai207@gmail.com',
-      to: userEmail,
-      subject: 'Welcome to Our App!',
-      text: `Your credentials:\nEmail: ${userEmail}\nPassword: ${userPassword}`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`Welcome email sent to ${userEmail}`);
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
-});
-
-
-//to get sequence number
-exports.getNextSequenceNumber = functions.https.onCall(async (data, context) => {
-  const docRef = db.collection('metadata').doc('sequenceNumber');
-
-  return db.runTransaction(async (transaction) => {
-    const doc = await transaction.get(docRef);
-    if (!doc.exists) {
-      throw "Document does not exist!";
-    }
-
-    const newSequenceNumber = doc.data().lastSequenceNumber + 1;
-    transaction.update(docRef, { lastSequenceNumber: newSequenceNumber });
-    return newSequenceNumber;
-  });
-});
+// exports.helloWorld = onRequest((request, response) => {
+//   logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });
