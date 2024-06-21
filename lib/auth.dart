@@ -1,13 +1,17 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:testrru1/database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
 import 'package:testrru1/models/user.dart';
 
 class Authservice {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final CollectionReference eventDataCollection = FirebaseFirestore.instance.collection("events");
 
   // Create user object based on firebaseUser(User)
   Users? _userFromFirebaseUser(User? user) {
@@ -40,4 +44,73 @@ class Authservice {
       return null;
     }
   }
-}
+
+
+
+
+  // Upload image to Firebase Storage
+  Future<String?> uploadImage(File imageFile,String title) async {
+    try {
+
+      final timestamp = DateTime.now().microsecondsSinceEpoch;
+      final filename = imageFile.path.split("/").last;
+      final storageRef = FirebaseStorage.instance.ref().child('$title/$timestamp-$filename');
+      final uploadTask = storageRef.putFile(imageFile);
+
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+
+
+      return downloadUrl;
+    } catch (e) {
+      print('Failed to upload image: $e');
+      return null;
+    }
+    }
+
+
+    //to creat new collection
+  Future<void> createCollection(CollectionReference collection) async {
+    try {
+      await collection.doc().set({});
+      print('Collection created successfully.');
+    } catch (e) {
+      print('Error creating collection: $e');
+    }
+  }
+
+    //event adding
+  Future<String?> updateEventData( Map<String, dynamic> eventData , String title) async {
+    try
+    {
+      CollectionReference collection = eventDataCollection;
+
+      final collectionExists = await collection.doc().get();
+      if(!collectionExists.exists)
+      {
+        await createCollection(collection);
+      }
+
+      await collection.doc(title).set(eventData);
+      print('Event data updated successfully.');
+      return 'it is done.';
+    }
+    catch(e)
+    {
+      print('Event data cannot be added.');
+      print(e);
+      return null;
+    }
+
+  }
+
+
+  }
+
+
+
+
+
+
+

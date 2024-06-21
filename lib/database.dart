@@ -8,13 +8,13 @@ class DatabaseServices {
   DatabaseServices({required this.uid});
 
   // Firestore instance
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+
 
   // Collections for students and faculty
   final CollectionReference studentCollection = FirebaseFirestore.instance.collection("students");
   final CollectionReference facultyCollection = FirebaseFirestore.instance.collection("faculty");
-  final CollectionReference userDataCollection = FirebaseFirestore.instance.collection("credentials");
+  final CollectionReference eventDataCollection = FirebaseFirestore.instance.collection("events");
+
 
   Future<void> updateUserData(String role, Map<String, dynamic> userData) async {
     try {
@@ -54,6 +54,8 @@ class DatabaseServices {
   }
 
 
+
+
 // Future<DocumentSnapshot> getUserData(String role) async {
   //   if (role == 'student') {
   //     return await studentCollection.doc(uid).get();
@@ -65,27 +67,6 @@ class DatabaseServices {
   // }
 
 
-  Future<void> addEvent({
-    required String title,
-    required String description,
-    required String date,
-    required String location,
-    required File imageFile,
-  }) async {
-    // Upload image to Firebase Storage
-    String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
-    UploadTask task = _storage.ref().child('event_images/$imageFileName').putFile(imageFile);
-    TaskSnapshot snapshot = await task.whenComplete(() => null);
-    String imageUrl = await snapshot.ref.getDownloadURL();
 
-    // Add event data to Firestore
-    await _db.collection('events').add({
-      'title': title,
-      'description': description,
-      'date': date,
-      'location': location,
-      'imageUrl': imageUrl,
-    });
-  }
 
 }

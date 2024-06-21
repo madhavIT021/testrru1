@@ -182,29 +182,28 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               SizedBox(height: 16,),
               TextFormField(
                 controller: _birthdateController,
+                readOnly: true,
                 decoration: InputDecoration(
-                  labelText: 'Birthdate',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
-                      );
-
-                      if (pickedDate != null) {
-                        setState(() {
-                          _birthdateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-                        });
-                      }
-                    },
-                  ),
+                  labelText: 'Date of Birth',
+                  suffixIcon: Icon(Icons.calendar_today),
                 ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null) {
+                    setState(() {
+                      _birthdateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                    });
+                  }
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your birthdate';
+                    return 'Please enter your date of birth';
                   }
                   return null;
                 },

@@ -4,8 +4,6 @@ import 'package:testrru1/eventPage.dart';
 import 'package:testrru1/faculty_profile_page.dart';
 import 'package:testrru1/register.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
 
 void main() async{
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -54,30 +52,7 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  late VideoPlayerController _videoPlayerController;
 
-  late ChewieController _chewieController;
-
-  @override
-  void initState() {
-    super.initState();
-    _videoPlayerController = VideoPlayerController.asset('assets/appointment.mp4');
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoInitialize: true,
-      looping: true,  // Set looping to true if you want the video to loop
-      allowPlaybackSpeedChanging: false,  // Optional: Customize playback controls
-      allowFullScreen: false,
-      // Other customization options can be set here as per your requirement
-    );
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
